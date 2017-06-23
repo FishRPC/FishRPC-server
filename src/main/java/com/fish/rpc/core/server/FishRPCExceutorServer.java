@@ -11,6 +11,9 @@ import com.fish.rpc.netty.recv.RecvChannelInit;
 import com.fish.rpc.parallel.FishRPCThreadPool;
 import com.fish.rpc.parallel.NamedThreadFactory;
 import com.fish.rpc.util.FishRPCConfig;
+import com.fish.rpc.util.FishRPCLog;
+//import com.fish.rpc.util.Log;
+import com.fish.rpc.util.TimeUtil;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -49,8 +52,8 @@ public class FishRPCExceutorServer {
                     .option(ChannelOption.SO_BACKLOG, 128)
                     .childOption(ChannelOption.SO_KEEPALIVE, true);
 
-            String[] ipAddr = FishRPCConfig.getStringValue("fish.rpc.server","127.0.0.1:5050").split(":");
-
+            String server = FishRPCConfig.getStringValue("fish.rpc.server","127.0.0.1:5050");
+            String[] ipAddr = server.split(":");
             if (ipAddr.length == 2) {
                 final String host = ipAddr[0];
                 final int port = Integer.parseInt(ipAddr[1]);
@@ -60,15 +63,20 @@ public class FishRPCExceutorServer {
                     @Override
                     public void operationComplete(final ChannelFuture channelFuture) throws Exception {
                         if (channelFuture.isSuccess()) {
-                            System.out.printf("FishRPC Server start success!\nip:%s\nport:%d\nprotocol:protostuff\n\n", host, port);
+                    		FishRPCLog.debug("FishRPC server start success  on host %s port %s",host,port);
+                        	System.out.println("FishRPC server start success !");
                         }
                     }
-                });
-            } else {
-                System.out.printf("FishRPC Server start fail!\n");
+                }); 
+            } else { 
+   			 	FishRPCLog.debug("FishRPC server start fail.fish.rpc.server config wrong %s",server);
             }
-        } catch (InterruptedException e) {
+        } catch (Exception e) {
             e.printStackTrace();
+            FishRPCLog.error(e, "error=%s", e.getMessage());
+            
+        }finally{
+        	
         }
     }
 
@@ -77,9 +85,9 @@ public class FishRPCExceutorServer {
         boss.shutdownGracefully();
     }
     
-    private static volatile ListeningExecutorService threadPoolExecutor;
+    private volatile ListeningExecutorService threadPoolExecutor;
     
-    public static void submit(Callable<Boolean> task, final ChannelHandlerContext ctx, final FishRPCRequest request, final FishRPCResponse response) {
+    public  void submit(Callable<Boolean> task, final ChannelHandlerContext ctx, final FishRPCRequest request, final FishRPCResponse response) {
         if (threadPoolExecutor == null) {
             synchronized (FishRPCExceutorServer.class) {
                 if (threadPoolExecutor == null) {
@@ -88,17 +96,17 @@ public class FishRPCExceutorServer {
             }
         }
         ListenableFuture<Boolean> listenableFuture = threadPoolExecutor.submit(task);
-        
         Futures.addCallback(listenableFuture, new FutureCallback<Boolean>() {
             public void onSuccess(Boolean result) {
-                ctx.writeAndFlush(response).addListener(new ChannelFutureListener() {
+            	FishRPCLog.debug("The request %s,server-replay-start at %s",request.getRequestId(),TimeUtil.currentDateString());
+            	ctx.writeAndFlush(response).addListener(new ChannelFutureListener() {
                     public void operationComplete(ChannelFuture channelFuture) throws Exception {
-            			System.out.println(request.getRequestId()+",server-write:"+(System.currentTimeMillis()));
+                    	FishRPCLog.debug("The request %s,server-replay-end at %s",request.getRequestId(),TimeUtil.currentDateString());
                     }
                 });
             }
             public void onFailure(Throwable t) {
-                t.printStackTrace();
+            	  t.printStackTrace();
             }
         }, threadPoolExecutor);
     }

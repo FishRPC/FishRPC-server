@@ -16,7 +16,9 @@
 package com.fish.rpc.boot;
 
 import com.fish.rpc.core.server.FishRPCExceutorServer;
+import com.fish.rpc.manager.FishRPCChannelGroups;
 import com.fish.rpc.manager.FishRPCManager;
+//import com.fish.rpc.util.Log;
 
 /**
  * 
@@ -27,24 +29,40 @@ import com.fish.rpc.manager.FishRPCManager;
 public class FishRPC {
     public static void start() {
     	try{ 
-    		System.out.println("");
-    		System.out.println("▄▄▄▄▄      ●●●●  ");
-    		System.out.println("▌          ▋         ●  ●        ▌      ▌");
-    		System.out.println("▌▄▄  ▋  ●  ");
-    		System.out.println("▌     ▋   ▋▅▅▅▅▅▌");
-    		System.out.println("▌     ▋        ●  ▌      ▌");
-    		System.out.println("▌     ▋        ●  ▌      ▌");
-    		System.out.println("▌     ▋   ●●●●●   ▌      ▌");
-    		System.out.println("");
-    		System.out.println("");
+    		System.out.println(" ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~");
+    		System.out.println(" o");
+    		System.out.println("   o  _ _ _ _ _ _ _ ");
+    		System.out.println(" oo  //           \\\\       _ _");
+    		System.out.println("o   //             \\\\     /    \\");
+    		System.out.println(" o //               \\\\   /  --- \\");
+    		System.out.println("o //                 \\\\ /   ---  \\");
+    		System.out.println("O)  o                 ||         +");
+    		System.out.println(" \\\\\\\\                // \\   ---  /");
+    		System.out.println("  \\\\\\\\              //   \\  --- /");
+    		System.out.println("   \\\\\\\\            //     \\_ _ / ");
+    		System.out.println("    \\\\            //");
+    		System.out.println("     ++++++++++++++");
     		System.out.println("FishRPC 1.0 Base Netty4.0 Build 2017/06/07 高考  Author：Fish");
     		System.out.println("");
     		System.out.println("");
 	    	FishRPCManager.getInstance().initServer();
 	    	FishRPCExceutorServer.getInstance().start();
+	    	new Thread(new Runnable(){
+				@Override
+				public void run() {
+					while(true){
+						System.out.println("当前服务器连接数："+FishRPCChannelGroups.size());
+						try {
+							Thread.sleep(1000);
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					} 
+				}
+	    	}).start();
     	}catch(Exception e){
-    		System.err.println(e.getMessage());
-    		e.printStackTrace();
+    		 e.printStackTrace();
     	}
     }
 }

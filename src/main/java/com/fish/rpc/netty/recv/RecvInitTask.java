@@ -8,9 +8,11 @@ import com.fish.rpc.dto.FishRPCRequest;
 import com.fish.rpc.dto.FishRPCResponse;
 import com.fish.rpc.manager.FishRPCManager;
 import com.fish.rpc.manager.FishRPCManager.RPCInterface;
+//import com.fish.rpc.util.Log;
+import com.fish.rpc.util.TimeUtil;
 
 public class RecvInitTask implements Callable<Boolean>{
-
+	
 	private FishRPCRequest request;
 	private FishRPCResponse response;
 	public RecvInitTask(FishRPCRequest req,FishRPCResponse rsp){
@@ -22,16 +24,12 @@ public class RecvInitTask implements Callable<Boolean>{
 		
 		response.setRequestId(request.getRequestId());
 		try{
-			 
-			System.out.println(request.getRequestId()+",server-breflect:"+(System.currentTimeMillis()));
-			Object result = reflect(request);
+  			Object result = reflect(request);
 			response.setResult(result);
-			System.out.println(request.getRequestId()+",server-areflect:"+(System.currentTimeMillis()));
-			return Boolean.TRUE;
+ 			return Boolean.TRUE;
 		}catch(Throwable e){
-			response.setError(e.getMessage());
+			response.setError(e.getMessage()); 
 			e.printStackTrace();
-			System.err.println("FishRPC Server invoke error!\n");
 			return Boolean.FALSE;
 		}
 	}

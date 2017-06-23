@@ -8,6 +8,8 @@ import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
 import com.fish.rpc.RPC;
 import com.fish.rpc.util.FishRPCConfig;
+//import com.fish.rpc.util.Log;
+import com.fish.rpc.util.TimeUtil;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.reflect.ClassPath;
 
@@ -16,7 +18,9 @@ public class FishRPCManager {
 	 
  	private static Map<String,RPCInterface> RPCReference = new HashMap<String,RPCInterface>();
 	public static FishRPCManager rpcManager = new FishRPCManager();
-	private FishRPCManager(){}
+	private FishRPCManager(){
+		
+	}
 	public static FishRPCManager getInstance(){
 		return rpcManager;
 	}
@@ -29,10 +33,14 @@ public class FishRPCManager {
 		FishRPCConfig.initServer();
 		for(String packageStr : FishRPCConfig.getStringValue("fish.rpc.scan.packages", "").split(",")){
 			init(packageStr);
-		} 
-		System.out.println("FishRPC-server regist info:");
+		}  
+		if(FishRPCConfig.onDebug()){
+			System.out.println("FishRPC-server regist info:");
+		}
         for(RPCInterface aRPCInterface : RPCReference.values()){
-        	System.out.println(aRPCInterface);
+        	if(FishRPCConfig.onDebug()){
+    			System.out.println(aRPCInterface.toString());
+    		}
     	} 
 	}
 	
@@ -57,8 +65,8 @@ public class FishRPCManager {
                   	RPCReference.put(rpcInterface.interfaceName,rpcInterface);
                 }
 			} 
-		} catch (Exception e) {
-			System.err.println("FishRPC-server init fail."+e.getMessage());
+		} catch (Exception e) { 
+			  e.printStackTrace();
 		}
 	}
 	
