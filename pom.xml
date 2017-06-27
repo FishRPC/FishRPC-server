@@ -39,10 +39,7 @@
             <version>19.0</version>
         </dependency> 
         <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-pool2 -->
-        
         <!-- https://mvnrepository.com/artifact/com.caucho/hessian -->
-
-       
         <!-- https://mvnrepository.com/artifact/cglib/cglib-nodep -->
         <dependency>
             <groupId>cglib</groupId>
@@ -53,7 +50,7 @@
             <groupId>com.fish.rpc</groupId>
 		    <artifactId>FishRPC-common</artifactId>
 		    <version>1.0-SNAPSHOT</version>
-        </dependency>
+        </dependency>  
     </dependencies>
     <build>
         <plugins>

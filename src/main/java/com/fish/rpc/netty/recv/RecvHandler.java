@@ -3,7 +3,7 @@ package com.fish.rpc.netty.recv;
 import com.fish.rpc.core.server.FishRPCExceutorServer;
 import com.fish.rpc.dto.FishRPCRequest;
 import com.fish.rpc.dto.FishRPCResponse;
-import com.fish.rpc.manager.FishRPCChannelGroups;
+import com.fish.rpc.manager.channel.FishRPCChannelGroups;
 import com.fish.rpc.util.FishRPCLog;
 //import com.fish.rpc.util.Log;
 import com.fish.rpc.util.TimeUtil;
@@ -24,17 +24,17 @@ public class RecvHandler  extends ChannelInboundHandlerAdapter {
     }
 
 	public void channelActive(ChannelHandlerContext ctx)throws Exception{
-		FishRPCChannelGroups.add(ctx.channel());
+		FishRPCChannelGroups.getInstance().add(ctx.channel());
 	}
 
 	public void channelInactive(ChannelHandlerContext ctx)throws Exception{
 	    ctx.fireChannelInactive();
-	    FishRPCChannelGroups.discard(ctx.channel());
+	    FishRPCChannelGroups.getInstance().discard(ctx.channel());
 	}
 	    
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
     	FishRPCLog.error(cause, cause.getMessage(), "");
-    	FishRPCChannelGroups.discard(ctx.channel());
+    	FishRPCChannelGroups.getInstance().discard(ctx.channel());
         ctx.close(); 
     }
 }

@@ -4,12 +4,13 @@ import java.util.concurrent.Callable;
 
 import org.apache.commons.lang3.reflect.MethodUtils;
 
+import com.fish.rpc.core.server.FishRPCExceutorServer;
 import com.fish.rpc.dto.FishRPCRequest;
 import com.fish.rpc.dto.FishRPCResponse;
 import com.fish.rpc.manager.FishRPCManager;
-import com.fish.rpc.manager.FishRPCManager.RPCInterface;
-//import com.fish.rpc.util.Log;
-import com.fish.rpc.util.TimeUtil;
+import com.fish.rpc.manager.RPCInterface;
+import com.fish.rpc.manager.timing.Timing;
+import com.fish.rpc.manager.timing.TimingTask;
 
 public class RecvInitTask implements Callable<Boolean>{
 	
@@ -24,9 +25,11 @@ public class RecvInitTask implements Callable<Boolean>{
 		
 		response.setRequestId(request.getRequestId());
 		try{
+			long start = System.currentTimeMillis();
   			Object result = reflect(request);
 			response.setResult(result);
- 			return Boolean.TRUE;
+			FishRPCExceutorServer.getInstance().submitSingle(new TimingTask(new Timing(request,response,System.currentTimeMillis() - start)));
+			return Boolean.TRUE;
 		}catch(Throwable e){
 			response.setError(e.getMessage()); 
 			e.printStackTrace();

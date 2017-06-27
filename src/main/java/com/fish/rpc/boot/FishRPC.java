@@ -16,9 +16,13 @@
 package com.fish.rpc.boot;
 
 import com.fish.rpc.core.server.FishRPCExceutorServer;
-import com.fish.rpc.manager.FishRPCChannelGroups;
 import com.fish.rpc.manager.FishRPCManager;
+import com.fish.rpc.manager.JMXAgentImpl;
+import com.fish.rpc.manager.channel.FishRPCChannelGroups;
+import com.fish.rpc.manager.timing.TimingCurrentRankList;
 //import com.fish.rpc.util.Log;
+import com.fish.rpc.manager.timing.TimingTotalRankList;
+import com.fish.rpc.util.FishRPCConfig;
 
 /**
  * 
@@ -47,20 +51,7 @@ public class FishRPC {
     		System.out.println("");
 	    	FishRPCManager.getInstance().initServer();
 	    	FishRPCExceutorServer.getInstance().start();
-	    	new Thread(new Runnable(){
-				@Override
-				public void run() {
-					while(true){
-						System.out.println("当前服务器连接数："+FishRPCChannelGroups.size());
-						try {
-							Thread.sleep(1000);
-						} catch (InterruptedException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-					} 
-				}
-	    	}).start();
+	    	JMXAgentImpl.getInstance().server();
     	}catch(Exception e){
     		 e.printStackTrace();
     	}

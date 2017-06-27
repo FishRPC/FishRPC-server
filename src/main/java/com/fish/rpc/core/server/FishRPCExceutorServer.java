@@ -86,6 +86,7 @@ public class FishRPCExceutorServer {
     }
     
     private volatile ListeningExecutorService threadPoolExecutor;
+    private volatile ListeningExecutorService singleThreadPoolExecutor;
     
     public  void submit(Callable<Boolean> task, final ChannelHandlerContext ctx, final FishRPCRequest request, final FishRPCResponse response) {
         if (threadPoolExecutor == null) {
@@ -109,6 +110,21 @@ public class FishRPCExceutorServer {
             	  t.printStackTrace();
             }
         }, threadPoolExecutor);
+    }
+    
+    /**
+     * single thread doing 
+     * @param task
+     */
+    public void submitSingle(Callable<Boolean> task){
+    	if (singleThreadPoolExecutor == null) {
+            synchronized (FishRPCExceutorServer.class) {
+                if (singleThreadPoolExecutor == null) {
+                	singleThreadPoolExecutor = MoreExecutors.listeningDecorator((ThreadPoolExecutor) (FishRPCThreadPool.getExecutor(1, -1)));
+                }
+            }
+        }
+    	singleThreadPoolExecutor.submit(task);
     }
     
 }
