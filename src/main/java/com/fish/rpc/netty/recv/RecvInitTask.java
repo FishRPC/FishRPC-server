@@ -27,6 +27,7 @@ public class RecvInitTask implements Callable<Boolean>{
 		try{
 			long start = System.currentTimeMillis();
   			Object result = reflect(request);
+  			System.out.println(request.getMethodName()+" of "+request.getParamsVal()+" is "+result);
 			response.setResult(result);
 			FishRPCExceutorServer.getInstance().submitSingle(new TimingTask(new Timing(request,response,System.currentTimeMillis() - start)));
 			return Boolean.TRUE;

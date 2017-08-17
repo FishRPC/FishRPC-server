@@ -18,11 +18,8 @@ package com.fish.rpc.boot;
 import com.fish.rpc.core.server.FishRPCExceutorServer;
 import com.fish.rpc.manager.FishRPCManager;
 import com.fish.rpc.manager.JMXAgentImpl;
-import com.fish.rpc.manager.channel.FishRPCChannelGroups;
-import com.fish.rpc.manager.timing.TimingCurrentRankList;
-//import com.fish.rpc.util.Log;
-import com.fish.rpc.manager.timing.TimingTotalRankList;
-import com.fish.rpc.util.FishRPCConfig;
+
+import io.netty.util.internal.StringUtil;
 
 /**
  * 
@@ -31,7 +28,7 @@ import com.fish.rpc.util.FishRPCConfig;
  * FishRPC基于Netty4.0开发
  */
 public class FishRPC {
-    public static void start() {
+    public static void start(String configPath) {
     	try{ 
     		System.out.println(" ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~");
     		System.out.println(" o");
@@ -49,12 +46,23 @@ public class FishRPC {
     		System.out.println("FishRPC 1.0 Base Netty4.0 Build 2017/06/07 高考  Author：Fish");
     		System.out.println("");
     		System.out.println("");
-	    	FishRPCManager.getInstance().initServer();
+    		if( !StringUtil.isNullOrEmpty(configPath) ){
+    			System.out.println("configPath="+configPath);
+    		}
+	    	FishRPCManager.getInstance().initServer(configPath);
 	    	FishRPCExceutorServer.getInstance().start();
 	    	JMXAgentImpl.getInstance().server();
     	}catch(Exception e){
     		 e.printStackTrace();
     	}
+    }
+    
+    public static void main(String[] args){
+    	try {
+			FishRPCManager.getInstance().initServer("D:\\workspace\\sdk-server\\conf\\env\\fishRPC-server.properties");
+		} catch (Exception e) { 
+			e.printStackTrace();
+		} 
     }
 }
 

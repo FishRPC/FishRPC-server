@@ -5,52 +5,32 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.fish.rpc</groupId>
     <artifactId>FishRPC-server</artifactId>
-    <version>1.0-SNAPSHOT</version>
-    <dependencies>
-        
-        <!-- https://mvnrepository.com/artifact/commons-collections/commons-collections -->
-        <dependency>
-            <groupId>commons-collections</groupId>
-            <artifactId>commons-collections</artifactId>
-            <version>3.1</version>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-            <version>3.4</version>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/io.netty/netty-all -->
-        <dependency>
-            <groupId>io.netty</groupId>
-            <artifactId>netty-all</artifactId>
-            <version>4.0.36.Final</version>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/com.esotericsoftware/kryo -->
-        <dependency>
-            <groupId>com.esotericsoftware</groupId>
-            <artifactId>kryo</artifactId>
-            <version>3.0.3</version>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>19.0</version>
-        </dependency> 
-        <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-pool2 -->
-        <!-- https://mvnrepository.com/artifact/com.caucho/hessian -->
+    <version>1.1.1-SNAPSHOT</version>
+    
+    <distributionManagement>
+		<repository>
+			<id>releases</id>
+			<url>http://192.168.0.7:8088/nexus/content/repositories/releases/</url>
+		</repository>
+		<snapshotRepository>
+			<id>snapshots</id>
+			<url>http://192.168.0.7:8088/nexus/content/repositories/snapshots/</url>
+		</snapshotRepository>
+	</distributionManagement>
+	
+    <dependencies> 
         <!-- https://mvnrepository.com/artifact/cglib/cglib-nodep -->
         <dependency>
-            <groupId>cglib</groupId>
-            <artifactId>cglib-nodep</artifactId>
-            <version>2.2</version>
-        </dependency>
+		  <groupId>com.thoughtworks.sun.jdmk</groupId>
+		  <artifactId>jmxtools</artifactId>
+		  <version>1.2.1</version>
+		</dependency>  
          <dependency>
             <groupId>com.fish.rpc</groupId>
 		    <artifactId>FishRPC-common</artifactId>
-		    <version>1.0-SNAPSHOT</version>
-        </dependency>  
+		    <version>1.1.1-SNAPSHOT</version>
+        </dependency> 
+         
     </dependencies>
     <build>
         <plugins>

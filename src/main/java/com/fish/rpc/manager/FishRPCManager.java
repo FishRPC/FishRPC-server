@@ -22,12 +22,21 @@ public class FishRPCManager {
 		return rpcManager;
 	}
 	
-	public void initClient() throws Exception{
-		FishRPCConfig.initClient(); 
+	/**
+	 * 默认采用当前运行路径下的fishRPC-client.properties
+	 * @param configPath
+	 * @throws Exception
+	 */
+	public void initClient(String configPath) throws Exception{
+		FishRPCConfig.initClient(configPath); 
 	}
-	
-	public void initServer() throws Exception{
-		FishRPCConfig.initServer();
+	/**
+	 * 默认采用当前运行路径下的fishRPC-server.properties
+	 * @param configPath
+	 * @throws Exception
+	 */
+	public void initServer(String configPath) throws Exception{
+		FishRPCConfig.initServer(configPath);
 		String rpcPackages = FishRPCConfig.getStringValue("fish.rpc.scan.packages", "");
 		if(StringUtils.isEmpty(rpcPackages)){
 			
