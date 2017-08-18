@@ -13,7 +13,7 @@ public class RecvChannelInit extends ChannelInitializer<SocketChannel> {
 	protected void initChannel(SocketChannel channel) throws Exception {
 		ChannelPipeline pipeline = channel.pipeline();
 		pipeline.addLast(new KryoEncoder());
-        pipeline.addLast(new KryoDecoder(false));
+        pipeline.addLast(new KryoDecoder());
 		/*pipeline.addLast(new ProtostuffEncoder());
 	    pipeline.addLast(new ProtostuffDecoder(false));
 		*/

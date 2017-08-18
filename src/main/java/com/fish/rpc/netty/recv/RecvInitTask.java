@@ -11,6 +11,7 @@ import com.fish.rpc.manager.FishRPCManager;
 import com.fish.rpc.manager.RPCInterface;
 import com.fish.rpc.manager.timing.Timing;
 import com.fish.rpc.manager.timing.TimingTask;
+import com.fish.rpc.util.FishRPCLog;
 
 public class RecvInitTask implements Callable<Boolean>{
 	
@@ -26,9 +27,9 @@ public class RecvInitTask implements Callable<Boolean>{
 		response.setRequestId(request.getRequestId());
 		try{
 			long start = System.currentTimeMillis();
-  			Object result = reflect(request);
-  			System.out.println(request.getMethodName()+" of "+request.getParamsVal()+" is "+result);
+  			Object result = reflect(request); 
 			response.setResult(result);
+			FishRPCLog.debug("the request [%s] , the response [%s]", request,response);
 			FishRPCExceutorServer.getInstance().submitSingle(new TimingTask(new Timing(request,response,System.currentTimeMillis() - start)));
 			return Boolean.TRUE;
 		}catch(Throwable e){
