@@ -71,10 +71,10 @@ public class FishRPCExceutorServer {
             } else { 
    			 	FishRPCLog.debug("FishRPC server start fail.fish.rpc.server config wrong %s",server);
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception e) { 
             FishRPCLog.error(e, "error=%s", e.getMessage());
-            
+            boss.shutdownGracefully();
+            worker.shutdownGracefully();
         }finally{
         	
         }
