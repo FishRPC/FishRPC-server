@@ -63,14 +63,13 @@ public class FishRPCExceutorServer {
                     @Override
                     public void operationComplete(final ChannelFuture channelFuture) throws Exception {
                         if (channelFuture.isSuccess()) {
-                    		FishRPCLog.debug("FishRPC server start success  on host %s port %s",host,port);
-                        	System.out.println("FishRPC server start success !");
-                        }
+                    		FishRPCLog.info("[FishRPCExceutorServer][start][FishRPC监听][%s][%s][成功]",host,port);
+                         }
                     }
                 }); 
             } else { 
-   			 	FishRPCLog.debug("FishRPC server start fail.fish.rpc.server config wrong %s",server);
-            }
+        		FishRPCLog.error("[FishRPCExceutorServer][start][FishRPC监听失败][配置格式错误][fish.rpc.server config][%s]",server);
+             }
         } catch (Exception e) { 
             FishRPCLog.error(e, "error=%s", e.getMessage());
             boss.shutdownGracefully();
@@ -78,13 +77,8 @@ public class FishRPCExceutorServer {
         }finally{
         	
         }
-    }
-
-    public void stop() {
-        worker.shutdownGracefully();
-        boss.shutdownGracefully();
-    }
-    
+    } 
+     
     private volatile ListeningExecutorService threadPoolExecutor;
     private volatile ListeningExecutorService singleThreadPoolExecutor;
     
@@ -99,10 +93,10 @@ public class FishRPCExceutorServer {
         ListenableFuture<Boolean> listenableFuture = threadPoolExecutor.submit(task);
         Futures.addCallback(listenableFuture, new FutureCallback<Boolean>() {
             public void onSuccess(Boolean result) {
-            	FishRPCLog.debug("The request %s,server-replay-start at %s",request.getRequestId(),TimeUtil.currentDateString());
-            	ctx.writeAndFlush(response).addListener(new ChannelFutureListener() {
+            	FishRPCLog.debug("[FishRPCExceutorServer][submit][开始发送数据：%s][请求ID：%s]",TimeUtil.currentDateString(),request.getRequestId());
+             	ctx.writeAndFlush(response).addListener(new ChannelFutureListener() {
                     public void operationComplete(ChannelFuture channelFuture) throws Exception {
-                    	FishRPCLog.debug("The request %s,server-replay-end at %s",request.getRequestId(),TimeUtil.currentDateString());
+                    	FishRPCLog.debug("[FishRPCExceutorServer][submit][发送数据完成：%s][请求ID：%s]",TimeUtil.currentDateString(),request.getRequestId());
                     }
                 });
             }

@@ -18,15 +18,12 @@ public class RecvHandler  extends ChannelInboundHandlerAdapter {
 	@Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         if( msg instanceof FishRPCHeartbeat ){
-        	FishRPCLog.debug("FishRPCHeartbeat...", "");
+        	FishRPCLog.debug("[RecvHandler][channelRead][心跳][%s]", msg);
         	return;
         }
 		final FishRPCRequest request = (FishRPCRequest) msg;
-        
-        FishRPCLog.debug("The request %s,server-read at %s",request.getRequestId(),TimeUtil.currentDateString());
-	        
+		FishRPCLog.debug("[RecvHandler][channelRead][读取数据：%s][请求ID：%s]",TimeUtil.currentDateString(), request.getRequestId());
         FishRPCResponse response = new FishRPCResponse();
-        
         //在NioEventLoop串行化设计的前提下，是否有必要切换线程[有必要]
         RecvInitTask recvTask = new RecvInitTask(request, response);
         FishRPCExceutorServer.getInstance().submit(recvTask, ctx, request, response);
@@ -53,7 +50,7 @@ public class RecvHandler  extends ChannelInboundHandlerAdapter {
         if (IdleStateEvent.class.isAssignableFrom(evt.getClass())) {  
             IdleState state = ((IdleStateEvent) evt).state();  
             if (state == IdleState.READER_IDLE) {  
-                throw new Exception("idle exception,close client."+ctx);  
+                throw new Exception("IDLE事件触发,释放客户端连接："+ctx);  
             }  
         } else {  
             super.userEventTriggered(ctx, evt);  

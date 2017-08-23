@@ -7,6 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.fish.rpc.RPC;
 import com.fish.rpc.util.FishRPCConfig;
+import com.fish.rpc.util.FishRPCLog;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.reflect.ClassPath;
 
@@ -38,20 +39,16 @@ public class FishRPCManager {
 	public void initServer(String configPath) throws Exception{
 		FishRPCConfig.initServer(configPath);
 		String rpcPackages = FishRPCConfig.getStringValue("fish.rpc.scan.packages", "");
-		if(StringUtils.isEmpty(rpcPackages)){
-			
-		}else{
+		if(!StringUtils.isEmpty(rpcPackages)){
 			for(String packageStr : FishRPCConfig.getStringValue("fish.rpc.scan.packages", "").split(",")){
 				init(packageStr);
 			}
-		}
-		if(FishRPCConfig.onDebug()){
-			System.out.println("FishRPC-server regist info:");
+		}else{
+			FishRPCLog.warn("[FishRPCManager][initServer][没有需要注册的RPC服务][fish.rpc.scan.packages : %s]", rpcPackages);
+			return ;
 		}
         for(RPCInterface aRPCInterface : RPCReference.values()){
-        	if(FishRPCConfig.onDebug()){
-    			System.out.println(aRPCInterface.toString());
-    		}
+        	FishRPCLog.info("[FishRPCManager][initServer][注册RPC服务信息][%s]",aRPCInterface);
     	} 
 	}
 	

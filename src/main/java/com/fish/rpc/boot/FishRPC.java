@@ -18,6 +18,7 @@ package com.fish.rpc.boot;
 import com.fish.rpc.core.server.FishRPCExceutorServer;
 import com.fish.rpc.manager.FishRPCManager;
 import com.fish.rpc.manager.JMXAgentImpl;
+import com.fish.rpc.util.FishRPCLog;
 
 import io.netty.util.internal.StringUtil;
 
@@ -30,7 +31,7 @@ import io.netty.util.internal.StringUtil;
 public class FishRPC {
     public static void start(String configPath) {
     	try{ 
-    		System.out.println(" ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~");
+    		/*System.out.println(" ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~");
     		System.out.println(" o");
     		System.out.println("   o  _ _ _ _ _ _ _ ");
     		System.out.println(" oo  //           \\\\       _ _");
@@ -42,12 +43,11 @@ public class FishRPC {
     		System.out.println("  \\\\\\\\              //   \\  --- /");
     		System.out.println("   \\\\\\\\            //     \\_ _ / ");
     		System.out.println("    \\\\            //");
-    		System.out.println("     ++++++++++++++");
-    		System.out.println("FishRPC 1.0 Base Netty4.0 Build 2017/06/07 高考  Author：Fish");
-    		System.out.println("");
-    		System.out.println("");
+    		System.out.println("     ++++++++++++++");*/ 
+    		 
+			FishRPCLog.info("[FishRPC][start] [v1.0] [Based on Netty4.0] [Build 2017/06/07 高考  Author：Fish]\n");
     		if( !StringUtil.isNullOrEmpty(configPath) ){
-    			System.out.println("configPath="+configPath);
+    			FishRPCLog.info("[FishRPC][start][config:%s]",configPath);
     		}
 	    	FishRPCManager.getInstance().initServer(configPath);
 	    	FishRPCExceutorServer.getInstance().start();
@@ -55,14 +55,6 @@ public class FishRPC {
     	}catch(Exception e){
     		 e.printStackTrace();
     	}
-    }
-    
-    public static void main(String[] args){
-    	try {
-			FishRPCManager.getInstance().initServer("D:\\workspace\\sdk-server\\conf\\env\\fishRPC-server.properties");
-		} catch (Exception e) { 
-			e.printStackTrace();
-		} 
     }
 }
 

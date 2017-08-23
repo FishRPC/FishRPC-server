@@ -63,8 +63,7 @@ public class TimingTotalRankList extends TimingRankList{
 				totalInfo.setElapsedTotal(t.getTiming());
 				totalInfoMap.put(key, totalInfo);
 			}else{
-				FishRPCLog.debug("total rank api over max %s ,will give up it %s.", maxRecords,key);
-				return;
+ 				return;
 			}
 			totalRankList = Collections.list(Collections.enumeration(totalInfoMap.values()));
 			Ordering<TimingTotalInfo> byOrdering = Ordering.from(new Comparator<TimingTotalInfo>(){

@@ -30,24 +30,23 @@ public class RecvInitTask implements Callable<Boolean>{
   			Object result = reflect(request); 
 			response.setResult(result);
 			response.setCode(0);
-			FishRPCLog.debug("the request [%s] , the response [%s]", request,response);
-			
+			FishRPCLog.info("[RecvInitTask][call][服务端执行结果]\n[请求：%s]\n[响应：%s]",request,response);
 		}catch(NoSuchMethodException e){
 			response.setCode(-1);
 			response.setError(e.getMessage()); 
 			response.setResult(e);
-			e.printStackTrace(); 
+			FishRPCLog.error(e,"[RecvInitTask][call][服务端执行异常][Exception : %s]\n[请求：%s]\n[响应：%s]",e.getMessage(),request,response);
 		}catch(IllegalAccessException e){
 			response.setCode(-1);
 			response.setError(e.getMessage()); 
 			response.setResult(e);
-			e.printStackTrace(); 
+			FishRPCLog.error(e,"[RecvInitTask][call][服务端执行异常][Exception : %s]\n[请求：%s]\n[响应：%s]",e.getMessage(),request,response);
 		}catch(InvocationTargetException e){
 			InvocationTargetException target = (InvocationTargetException)e;
 			response.setCode(-1);
 			response.setError(target.getMessage()); 
 			response.setResult(target.getTargetException());
-			e.printStackTrace(); 
+			FishRPCLog.error(e,"[RecvInitTask][call][服务端执行异常][Exception : %s]\n[请求：%s]\n[响应：%s]",e.getMessage(),request,response);
 		} 
 		FishRPCExceutorServer.getInstance().submitSingle(new TimingTask(new Timing(request,response,System.currentTimeMillis() - start)));
 		return Boolean.TRUE;
