@@ -17,7 +17,7 @@ public class RecvChannelInit extends ChannelInitializer<SocketChannel> {
 		ChannelPipeline pipeline = channel.pipeline();
 		pipeline.addLast(new KryoEncoder());
         pipeline.addLast(new KryoDecoder());
-        pipeline.addLast(new IdleStateHandler(5, 0, 0, TimeUnit.SECONDS));
+        pipeline.addLast(new IdleStateHandler(60, 0, 0, TimeUnit.SECONDS));
 		/*pipeline.addLast(new ProtostuffEncoder());
 	    pipeline.addLast(new ProtostuffDecoder(false));
 		*/

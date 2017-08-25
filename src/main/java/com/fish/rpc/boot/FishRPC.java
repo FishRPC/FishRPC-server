@@ -30,21 +30,7 @@ import io.netty.util.internal.StringUtil;
  */
 public class FishRPC {
     public static void start(String configPath) {
-    	try{ 
-    		/*System.out.println(" ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~");
-    		System.out.println(" o");
-    		System.out.println("   o  _ _ _ _ _ _ _ ");
-    		System.out.println(" oo  //           \\\\       _ _");
-    		System.out.println("o   //             \\\\     /    \\");
-    		System.out.println(" o //               \\\\   /  --- \\");
-    		System.out.println("o //                 \\\\ /   ---  \\");
-    		System.out.println("O)  o                 ||         +");
-    		System.out.println(" \\\\\\\\                // \\   ---  /");
-    		System.out.println("  \\\\\\\\              //   \\  --- /");
-    		System.out.println("   \\\\\\\\            //     \\_ _ / ");
-    		System.out.println("    \\\\            //");
-    		System.out.println("     ++++++++++++++");*/ 
-    		 
+    	try{  
 			FishRPCLog.info("[FishRPC][start] [v1.0] [Based on Netty4.0] [Build 2017/06/07 高考  Author：Fish]\n");
     		if( !StringUtil.isNullOrEmpty(configPath) ){
     			FishRPCLog.info("[FishRPC][start][config:%s]",configPath);
@@ -55,6 +41,15 @@ public class FishRPC {
     	}catch(Exception e){
     		 e.printStackTrace();
     	}
-    }
+    } 
+    public static void start(String configPath,ClassLoader cl) {
+    	try{ 
+    		Thread.currentThread().setContextClassLoader(cl);
+    		start(configPath);
+    	}catch(Exception e){
+    		 e.printStackTrace();
+    	}
+    } 
+     
 }
 
