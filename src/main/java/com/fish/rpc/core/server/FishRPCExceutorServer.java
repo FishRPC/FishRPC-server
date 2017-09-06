@@ -2,39 +2,31 @@ package com.fish.rpc.core.server;
 
 import java.nio.channels.spi.SelectorProvider;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
 
-import com.fish.rpc.dto.FishRPCRequest;
-import com.fish.rpc.dto.FishRPCResponse;
 import com.fish.rpc.netty.recv.RecvChannelInit;
-import com.fish.rpc.parallel.FishRPCThreadPool;
 import com.fish.rpc.parallel.NamedThreadFactory;
 import com.fish.rpc.util.FishRPCConfig;
 import com.fish.rpc.util.FishRPCLog;
-//import com.fish.rpc.util.Log;
-import com.fish.rpc.util.TimeUtil;
-import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.ListenableFuture;
-import com.google.common.util.concurrent.ListeningExecutorService;
-import com.google.common.util.concurrent.MoreExecutors;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
-import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
+import io.netty.channel.local.LocalEventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.util.concurrent.Future;
 
 public class FishRPCExceutorServer {
 	
-    ThreadFactory threadRpcFactory = new NamedThreadFactory("FishRPC-ThreadFactory");
-    EventLoopGroup boss = new NioEventLoopGroup();
-    EventLoopGroup worker = new NioEventLoopGroup(FishRPCConfig.PARALLEL, threadRpcFactory, SelectorProvider.provider());
-    
+    ThreadFactory bossThreadRpcFactory = new NamedThreadFactory("FishRPC-ThreadFactory-boss");
+    ThreadFactory workThreadRpcFactory = new NamedThreadFactory("FishRPC-ThreadFactory-work");
+    EventLoopGroup boss = new NioEventLoopGroup(FishRPCConfig.PARALLEL, bossThreadRpcFactory);
+    EventLoopGroup worker = new NioEventLoopGroup(FishRPCConfig.PARALLEL, workThreadRpcFactory, SelectorProvider.provider());
+    EventLoopGroup local = new LocalEventLoopGroup();
     private static class FishRPCExceutorServerHolder {
         static final FishRPCExceutorServer instance = new FishRPCExceutorServer();
     }
@@ -69,56 +61,44 @@ public class FishRPCExceutorServer {
                 }); 
             } else { 
         		FishRPCLog.error("[FishRPCExceutorServer][start][FishRPC监听失败][配置格式错误][fish.rpc.server config][%s]",server);
-             }
+            }
         } catch (Exception e) { 
             FishRPCLog.error(e, "error=%s", e.getMessage());
             boss.shutdownGracefully();
             worker.shutdownGracefully();
+            local.shutdownGracefully();
         }finally{
         	
         }
-    } 
+    }
      
-    private volatile ListeningExecutorService threadPoolExecutor;
-    private volatile ListeningExecutorService singleThreadPoolExecutor;
-    
-    public  void submit(Callable<Boolean> task, final ChannelHandlerContext ctx, final FishRPCRequest request, final FishRPCResponse response) {
-        if (threadPoolExecutor == null) {
-            synchronized (FishRPCExceutorServer.class) {
-                if (threadPoolExecutor == null) {
-                    threadPoolExecutor = MoreExecutors.listeningDecorator((ThreadPoolExecutor) (FishRPCThreadPool.getExecutor(FishRPCConfig.getIntValue("fish.rpc.server.thread.num", 10), -1)));
-                }
-            }
-        }
-        ListenableFuture<Boolean> listenableFuture = threadPoolExecutor.submit(task);
-        Futures.addCallback(listenableFuture, new FutureCallback<Boolean>() {
-            public void onSuccess(Boolean result) {
-            	FishRPCLog.debug("[FishRPCExceutorServer][submit][开始发送数据：%s][请求ID：%s]",TimeUtil.currentDateString(),request.getRequestId());
-             	ctx.writeAndFlush(response).addListener(new ChannelFutureListener() {
-                    public void operationComplete(ChannelFuture channelFuture) throws Exception {
-                    	FishRPCLog.debug("[FishRPCExceutorServer][submit][发送数据完成：%s][请求ID：%s]",TimeUtil.currentDateString(),request.getRequestId());
-                    }
-                });
-            }
-            public void onFailure(Throwable t) {
-            	  t.printStackTrace();
-            }
-        }, threadPoolExecutor);
+    public <T> void submit(Callable<T> task,final ICallback<T> callback) {
+        Future<T> future = local.submit(task);
+		try {
+			 T t = future.get();
+			 Throwable exception = future.cause();
+			 if( exception == null ){
+		        callback.onSuccess(t); 
+		     }else{
+		        callback.onFailure(exception);
+		     } 
+		} catch (InterruptedException | ExecutionException e) {
+			 callback.onFailure(e);
+		}
     }
     
-    /**
-     * single thread doing 
-     * @param task
-     */
-    public void submitSingle(Callable<Boolean> task){
-    	if (singleThreadPoolExecutor == null) {
-            synchronized (FishRPCExceutorServer.class) {
-                if (singleThreadPoolExecutor == null) {
-                	singleThreadPoolExecutor = MoreExecutors.listeningDecorator((ThreadPoolExecutor) (FishRPCThreadPool.getExecutor(1, -1)));
-                }
-            }
-        }
-    	singleThreadPoolExecutor.submit(task);
+    public void shutDown() throws InterruptedException{
+    	 boss.shutdownGracefully().sync();
+    	 FishRPCLog.warn("[FishRPCExceutorServer][shutDown][boss]");
+    	 Thread.sleep(5000);
+    	 
+    	 worker.shutdownGracefully().sync();
+         FishRPCLog.warn("[FishRPCExceutorServer][shutDown][worker]");
+         Thread.sleep(5000);
+    	 
+         local.shutdownGracefully().sync();
+    	 FishRPCLog.warn("[FishRPCExceutorServer][shutDown][local]");
+    	 Thread.sleep(5000);
     }
     
 }

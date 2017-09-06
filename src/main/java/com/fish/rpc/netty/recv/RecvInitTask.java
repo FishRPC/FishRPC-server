@@ -5,13 +5,10 @@ import java.util.concurrent.Callable;
 
 import org.apache.commons.lang3.reflect.MethodUtils;
 
-import com.fish.rpc.core.server.FishRPCExceutorServer;
 import com.fish.rpc.dto.FishRPCRequest;
 import com.fish.rpc.dto.FishRPCResponse;
 import com.fish.rpc.manager.FishRPCManager;
 import com.fish.rpc.manager.RPCInterface;
-import com.fish.rpc.manager.timing.Timing;
-import com.fish.rpc.manager.timing.TimingTask;
 import com.fish.rpc.util.FishRPCLog;
 
 public class RecvInitTask implements Callable<Boolean>{
@@ -21,11 +18,11 @@ public class RecvInitTask implements Callable<Boolean>{
 	public RecvInitTask(FishRPCRequest req,FishRPCResponse rsp){
 		this.request = req;
 		this.response = rsp;
-	}
+ 	}
 	@Override
 	public Boolean call()  {
 		long start = System.currentTimeMillis();
-		response.setRequestId(request.getRequestId());
+		response.setServerStartBusinessTime(start);
 		try{
   			Object result = reflect(request); 
 			response.setResult(result);
@@ -47,8 +44,9 @@ public class RecvInitTask implements Callable<Boolean>{
 			response.setError(target.getMessage()); 
 			response.setResult(target.getTargetException());
 			FishRPCLog.error(e,"[RecvInitTask][call][服务端执行异常][Exception : %s]\n[请求：%s]\n[响应：%s]",e.getMessage(),request,response);
-		} 
-		FishRPCExceutorServer.getInstance().submitSingle(new TimingTask(new Timing(request,response,System.currentTimeMillis() - start)));
+		}finally{
+			response.setServerDoneBusinessTime(System.currentTimeMillis());
+		}
 		return Boolean.TRUE;
 	}
 	

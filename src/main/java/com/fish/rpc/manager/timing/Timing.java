@@ -46,8 +46,8 @@ public class Timing {
 	  String method = request.getMethodName();
 	  String params = StringUtils.join(request.getParamsVal(), ",");
 	  String all = className+"."+method+"("+params+")";
-	  String requestTime = df.format(new Date(request.getRequestTime()));
-	  String responseTime = df.format(new Date(response.getResponseTime()));
+	  String requestTime = df.format(new Date(request.getClientAwaitAtTime()));
+	  String responseTime = df.format(new Date(request.getClientSignalAtTime()));
 	  return "Marked at ["+start+"],elapsed["+timing+"]ms on ["+all+"],"
 	  		+ "request id["+request.getRequestId()+"],resquest time["+requestTime+"],response time["+responseTime+"]";
 	}
