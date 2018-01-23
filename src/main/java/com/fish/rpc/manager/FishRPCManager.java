@@ -6,6 +6,7 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 
 import com.fish.rpc.RPC;
+import com.fish.rpc.ResourceId;
 import com.fish.rpc.util.FishRPCConfig;
 import com.fish.rpc.util.FishRPCLog;
 import com.google.common.collect.ImmutableSet;
@@ -62,15 +63,27 @@ public class FishRPCManager {
 				if(clazz.isInterface())continue;
 				RPC rpc = clazz.getAnnotation(RPC.class);
 				if(rpc==null)continue;
+				
+				//Http 服务唯一资源标识
+				ResourceId resourceId = clazz.getAnnotation(ResourceId.class);
+				if(resourceId != null){
+             		if(RPCReference.containsKey(resourceId.id())){
+            			FishRPCLog.warn("[FishRPCManager][initServer][存在重复的resourceId，将被覆盖][class : %s][resourceId:%s]",clazz.getName() ,resourceId.id());
+             		}
+             		RPCInterface rpcInterface = new RPCInterface();
+             		rpcInterface.impl = Class.forName(clazz.getName(),true, Thread.currentThread().getContextClassLoader()).newInstance();
+             		RPCReference.put(resourceId.id(),rpcInterface);
+             	}
+				
 				Class<?>[] interfaces = clazz.getInterfaces();
 				if(interfaces==null || interfaces.length==0)continue;
                 String server = FishRPCConfig.getStringValue("fish.rpc.server", "127.0.0.1:5050");
                 for(Class<?> interfaceClz : interfaces){
                 	RPCInterface rpcInterface = new RPCInterface();
-                 	rpcInterface.interfaceName = interfaceClz.getName();
+                	rpcInterface.interfaceName = interfaceClz.getName();
                  	rpcInterface.server=server; 
                  	rpcInterface.impl = Class.forName(clazz.getName(),true, Thread.currentThread().getContextClassLoader()).newInstance();
-                  	RPCReference.put(rpcInterface.interfaceName,rpcInterface);
+                 	RPCReference.put(rpcInterface.interfaceName,rpcInterface);
                 }
 			} 
 		} catch (Exception e) { 

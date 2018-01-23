@@ -90,7 +90,7 @@ public class RecvHandler extends ChannelDuplexHandler {
 			response.setRequestId(request.getRequestId());
 			response.setServerReceiveAtTime(System.currentTimeMillis());
 			response.setServerStartBusinessTime(start);
-  			Object result = reflect(request); 
+  			Object result = reflect(request);
 			response.setResult(result);
 			response.setCode(0);
 			FishRPCLog.info("[RecvInitTask][call][服务端执行结果]\n[请求：%s]\n[响应：%s]",request,response);

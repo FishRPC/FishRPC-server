@@ -15,9 +15,9 @@
  */
 package com.fish.rpc.boot;
 
+import com.fish.rpc.core.server.FishHttpServer;
 import com.fish.rpc.core.server.FishRPCExceutorServer;
 import com.fish.rpc.manager.FishRPCManager;
-import com.fish.rpc.manager.JMXAgentImpl;
 import com.fish.rpc.util.FishRPCLog;
 
 import io.netty.util.internal.StringUtil;
@@ -30,6 +30,23 @@ import io.netty.util.internal.StringUtil;
  */
 public class FishRPC {
 	private static boolean shutdownHookEnabled = false;
+	
+	public static void startHttpServer(final String host,final int port){
+		new Thread(new Runnable(){
+			@Override
+			public void run() {
+				FishHttpServer httpServer = new FishHttpServer();
+				try {
+					FishRPCLog.info("[FishHttp][start] [v1.0] [Based on Netty4.0] [Build 2017/06/07 高考  Author：Fish]\n");
+					httpServer.start(host,port);
+				} catch (Exception e) { 
+					e.printStackTrace();
+				} 
+			}
+			
+		}).start();
+		
+	}
 	public static void start(String configPath) {
     	try{  
 			FishRPCLog.info("[FishRPC][start] [v1.0] [Based on Netty4.0] [Build 2017/06/07 高考  Author：Fish]\n");
@@ -42,7 +59,8 @@ public class FishRPC {
     	}catch(Exception e){
     		 e.printStackTrace();
     	}finally{
-    		exit();
+    		//jws退出有问题
+    		//exit();
     	}
     } 
     public static void start(String configPath,ClassLoader cl) {

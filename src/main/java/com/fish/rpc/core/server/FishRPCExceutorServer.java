@@ -90,15 +90,12 @@ public class FishRPCExceutorServer {
     public void shutDown() throws InterruptedException{
     	 boss.shutdownGracefully().sync();
     	 FishRPCLog.warn("[FishRPCExceutorServer][shutDown][boss]");
-    	 Thread.sleep(5000);
     	 
     	 worker.shutdownGracefully().sync();
          FishRPCLog.warn("[FishRPCExceutorServer][shutDown][worker]");
-         Thread.sleep(5000);
-    	 
+         
          local.shutdownGracefully().sync();
     	 FishRPCLog.warn("[FishRPCExceutorServer][shutDown][local]");
-    	 Thread.sleep(5000);
     }
     
 }
