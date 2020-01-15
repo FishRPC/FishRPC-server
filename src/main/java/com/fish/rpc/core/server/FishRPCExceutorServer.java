@@ -5,6 +5,8 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ThreadFactory;
 
+import com.alibaba.nacos.api.exception.NacosException;
+import com.fish.nacos.FishNacos;
 import com.fish.rpc.netty.recv.RecvChannelInit;
 import com.fish.rpc.parallel.NamedThreadFactory;
 import com.fish.rpc.util.FishRPCConfig;
@@ -21,7 +23,7 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.util.concurrent.Future;
 
 public class FishRPCExceutorServer {
-	
+
     ThreadFactory bossThreadRpcFactory = new NamedThreadFactory("FishRPC-ThreadFactory-boss");
     ThreadFactory workThreadRpcFactory = new NamedThreadFactory("FishRPC-ThreadFactory-work");
     EventLoopGroup boss = new NioEventLoopGroup(FishRPCConfig.PARALLEL, bossThreadRpcFactory);
@@ -34,7 +36,7 @@ public class FishRPCExceutorServer {
     public static FishRPCExceutorServer getInstance() {
         return FishRPCExceutorServerHolder.instance;
     }
-    
+
     public void start() {
         try {
             ServerBootstrap bootstrap = new ServerBootstrap();
@@ -56,46 +58,49 @@ public class FishRPCExceutorServer {
                     public void operationComplete(final ChannelFuture channelFuture) throws Exception {
                         if (channelFuture.isSuccess()) {
                     		FishRPCLog.info("[FishRPCExceutorServer][start][FishRPC监听][%s][%s][成功]",host,port);
-                         }
+                            boolean nacosEnable = FishRPCConfig.getBooleanValue("nacos.enable", false);
+                            String nacosServerName = FishRPCConfig.getStringValue("nacos.server.name","fish.rpc.server")+".rpc";
+                            FishNacos.registerNacosService(nacosEnable,nacosServerName, host, port);
+                        }
                     }
-                }); 
-            } else { 
+                });
+            } else {
         		FishRPCLog.error("[FishRPCExceutorServer][start][FishRPC监听失败][配置格式错误][fish.rpc.server config][%s]",server);
             }
-        } catch (Exception e) { 
+        } catch (Exception e) {
             FishRPCLog.error(e, "error=%s", e.getMessage());
             boss.shutdownGracefully();
             worker.shutdownGracefully();
             local.shutdownGracefully();
         }finally{
-        	
+
         }
     }
-     
+
     public <T> void submit(Callable<T> task,final ICallback<T> callback) {
         Future<T> future = local.submit(task);
 		try {
 			 T t = future.get();
 			 Throwable exception = future.cause();
 			 if( exception == null ){
-		        callback.onSuccess(t); 
+		        callback.onSuccess(t);
 		     }else{
 		        callback.onFailure(exception);
-		     } 
+		     }
 		} catch (InterruptedException | ExecutionException e) {
 			 callback.onFailure(e);
 		}
     }
-    
+
     public void shutDown() throws InterruptedException{
     	 boss.shutdownGracefully().sync();
     	 FishRPCLog.warn("[FishRPCExceutorServer][shutDown][boss]");
-    	 
+
     	 worker.shutdownGracefully().sync();
          FishRPCLog.warn("[FishRPCExceutorServer][shutDown][worker]");
-         
+
          local.shutdownGracefully().sync();
     	 FishRPCLog.warn("[FishRPCExceutorServer][shutDown][local]");
     }
-    
+
 }
